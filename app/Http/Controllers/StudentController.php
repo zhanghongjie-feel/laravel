@@ -26,12 +26,12 @@ class StudentController extends Controller
         // $info=DB::table('student')->leftJoin('class','student.class_id','=','class.class_id')->get()->toArray();
         // dd($info);
         //打印日志语句
-        DB::connection('mysql_shop')->enableQueryLog();
+        // DB::connection('mysql_shop')->enableQueryLog($info);
         //查看这个表里的数据
-        $info=DB::connection('mysql_shop')->table('db')->where('db','like','%test%')->get()->toArray();
+        // $info=DB::connection('mysql_shop')->table('db')->where('db','like','%test%')->get()->toArray();
         // dd($info);
-        $sql=DB::connection('mysql_shop')->getQueryLog();
-        var_dump($sql);
+        // $sql=DB::connection('mysql_shop')->getQueryLog();
+        // var_dump($sql);
         $redis= new \Redis();
         $redis->connect('127.0.0.1','6379');
         $redis->incr('num');

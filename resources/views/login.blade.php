@@ -22,7 +22,7 @@
         	@endif
 			<div class="login">
 				<div class="row">
-                    <form class="col s12" action="{{url('admin/do_login')}}">
+                    <form class="col s12" action="{{url('home/do_login')}}">
                     @csrf
 						<div class="input-field">
 							<input type="text" class="validate" placeholder="USERNAME" name="name" required>

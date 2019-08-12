@@ -26,6 +26,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->call(function () {
+            //业务逻辑
+            \Log::Info('进入调度了');
+        })->everyMinute();
     }
 
     /**
@@ -40,3 +44,4 @@ class Kernel extends ConsoleKernel
         require base_path('routes/console.php');
     }
 }
+// https://github.com/mnmnwq/shop_demo
