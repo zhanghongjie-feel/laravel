@@ -37,6 +37,7 @@ Route::get('/wechat/get_user_tag','WechatController@get_user_tag');
 Route::get('/wechat/push_tag_message','WechatController@push_tag_message');
 Route::post('/wechat/add_user_tag','WechatController@add_user_tag');
 Route::post('/wechat/do_push_tag_message','WechatController@do_push_tag_message');
+Route::get('/wechat/event','WechatController@event');
 
 
 ///////////////

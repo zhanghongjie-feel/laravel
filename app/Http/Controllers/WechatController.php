@@ -126,7 +126,7 @@ class WechatController extends Controller
        }
    }
    public function add_tag(){
-          return view('Wechat.addTag');
+          return view('wechat.addTag');
       }
       /**
       * 批量给用户打标签
@@ -174,6 +174,8 @@ class WechatController extends Controller
   }
   public function event()
       {
+        echo $_GET['echostr'];
+        die();
           $data = file_get_contents("php://input");
           //解析XML
           $xml = simplexml_load_string($data);        //将 xml字符串 转换成对象
