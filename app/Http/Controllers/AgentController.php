@@ -55,7 +55,7 @@ class AgentController extends Controller
         //保存图片
         $path = 'qrcode/'.$file_name;
         $re = Storage::disk('local')->put($path, $response->getBody());
-        $qrcode_url = env('APP_URL').'/storage/'.$path;
+        $qrcode_url = env('APP_URL1').'/storage/'.$path;
         //存入数据库
         DB::connection('weixin')->table('user')->where(['id'=>$uid])->update([
             'qrcode_url' => $qrcode_url,
