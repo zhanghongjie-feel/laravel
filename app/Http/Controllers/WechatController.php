@@ -172,30 +172,77 @@ class WechatController extends Controller
       $re = $this->wechat->tag_user($request->all()['id']);
       dd($re);
   }
-  public function event()
-      {
-        // echo $_GET['echostr'];
-        // die();
-        //   $data = file_get_contents("php://input");
-        //   //解析XML
-        //   $xml = simplexml_load_string($data);        //将 xml字符串 转换成对象
-        //   $xml = (array)$xml; //转化成数组
-        //   \Log::Info(json_encode($xml));
-        //   //echo $_GET['echostr'];
-          //$this->checkSignature();
+   /**
+     * 微信消息推送
+     */
+    public function event()
+    {
+        //$this->checkSignature();
         $data = file_get_contents("php://input");
-        dd($data);
         //解析XML
         $xml = simplexml_load_string($data,'SimpleXMLElement', LIBXML_NOCDATA);        //将 xml字符串 转换成对象
         $xml = (array)$xml; //转化成数组
+        //echo "<pre>";print_r($xml);
+        \Log::Info(json_encode($xml));  //输出收到的信息
         $log_str = date('Y-m-d H:i:s') . "\n" . $data . "\n<<<<<<<";
         file_put_contents(storage_path('logs/wx_event.log'),$log_str,FILE_APPEND);
-        \Log::Info(json_encode($xml));
-        $message = '你好!';
-        $xml_str = '<xml><ToUserName><![CDATA['.$xml['FromUserName'].']]></ToUserName><FromUserName><![CDATA['.$xml['ToUserName'].']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['.$message.']]></Content></xml>';
-        echo $xml_str;
-        //echo $_GET['echostr'];
-      }
+        if($xml['MsgType'] == 'event'){
+            if($xml['Event'] == 'subscribe'){ //关注
+                if(!empty($xml['EventKey'])){
+                    //拉新操作
+                    $agent_code = explode('_',$xml['EventKey'])[1];
+                    $agent_info = DB::connection('mysql_cart')->table('user_agent')->where(['uid'=>$agent_code,'openid'=>$xml['FromUserName']])->first();
+                    if(empty($agent_info)){
+                        DB::connection('mysql_cart')->table('user_agent')->insert([
+                            'uid'=>$agent_code,
+                            'openid'=>$xml['FromUserName'],
+                            'add_time'=>time()
+                        ]);
+                    }
+                }
+                $message = '你好!';
+                $xml_str = '<xml><ToUserName><![CDATA['.$xml['FromUserName'].']]></ToUserName><FromUserName><![CDATA['.$xml['ToUserName'].']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['.$message.']]></Content></xml>';
+                echo $xml_str;
+            }elseif($xml['Event'] == 'location_select'){
+                $message = $xml['SendLocationInfo']->Label;
+                \Log::Info($message);
+                $xml_str = '<xml><ToUserName><![CDATA[otAUQ1UtX-nKATwQMq5euKLME2fg]]></ToUserName><FromUserName><![CDATA['.$xml['ToUserName'].']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['.$message.']]></Content></xml>';
+                echo $xml_str;
+            }elseif($xml['Event'] == 'CLICK'){
+                $message = '你好!';
+                $xml_str = '<xml><ToUserName><![CDATA['.$xml['FromUserName'].']]></ToUserName><FromUserName><![CDATA['.$xml['ToUserName'].']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['.$message.']]></Content></xml>';
+                echo $xml_str;
+            }
+        }elseif($xml['MsgType'] == 'text'){
+            $message = '你好!';
+            $xml_str = '<xml><ToUserName><![CDATA['.$xml['FromUserName'].']]></ToUserName><FromUserName><![CDATA['.$xml['ToUserName'].']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['.$message.']]></Content></xml>';
+            echo $xml_str;
+        }
+        //echo $_GET['echostr'];  //第一次访问
+    }
+     /**
+     * 修改标签
+     */
+    public function update_tag(Request $request)
+    {
+        return view('Wechat.updateTag',['tag_id'=>$request->all()['tag_id'],'tag_name'=>$request->all()['tag_name']]);
+    }
+    /**
+     * 执行修改标签
+     * @param Request $request
+     */
+    public function do_update_tag(Request $request)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/tags/update?access_token='.$this->wechat->get_access_token();
+        $data = [
+            'tag' => [
+                'id' => $request->all()['tag_id'],
+                'name' => $request->all()['name']
+            ]
+        ];
+        $re = $this->wechat->post($url,json_encode($data,JSON_UNESCAPED_UNICODE));
+        dd(json_decode($re,1));
+    }
     /**
    * 模板列表
    */
@@ -303,6 +350,11 @@ public function get_voice_source()
         dd($re);
         //return $file_name;
     }
+    /**
+     * 上传资源
+     * @param Request $request
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
    public function do_upload(Request $request)
    {
        $client = new Client();
@@ -404,7 +456,12 @@ public function get_voice_source()
         // dd($res);
         return $user_info;
     }
-
+    public function wechat_user_info($openid){
+        $access_token = $this->wechat->get_access_token();
+        $wechat_user = file_get_contents("https://api.weixin.qq.com/cgi-bin/user/info?access_token=".$access_token."&openid=".$openid."&lang=zh_CN");
+        $user_info = json_decode($wechat_user,1);
+        return $user_info;
+    }
     public function login()
    {
 
@@ -452,7 +509,7 @@ public function get_voice_source()
             ]);
             DB::connection('weixin')->commit();
             //登陆操作
-          $user_info = DB::connection('mysql_cart')->table("user")->where(['id'=>$user_openid->uid])->first();
+          $user_info = DB::connection('weixin')->table("user")->where(['id'=>$user_openid->uid])->first();
           $request->session()->put('username','name');
           //你在我们的网站登录了
           dd('没有账号，你太难了');
@@ -527,5 +584,29 @@ public function get_voice_source()
       }
 
       return $access_token;
+    }
+    
+    /**
+     * 消息加密验证
+     */
+    public function checkSignature()
+    {
+        //先获取到这三个参数
+        $signature = $_GET['signature'];
+        $nonce = $_GET['nonce'];
+        $timestamp = $_GET['timestamp'];
+        //把这三个参数存到一个数组里面
+        $tmpArr = [$timestamp,$nonce,'token'];
+        //进行字典排序
+        sort($tmpArr);
+        //把数组中的元素合并成字符串，impode()函数是用来将一个数组合并成字符串的
+        $tmpStr = implode($tmpArr);
+        //sha1加密，调用sha1函数
+        $tmpStr = sha1($tmpStr);
+        //判断加密后的字符串是否和signature相等
+        if($tmpStr == $signature)
+        {
+            //echo $_GET['echostr'];
+        }
     }
 }

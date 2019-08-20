@@ -41,7 +41,15 @@ Route::get('/wechat/event','WechatController@event');
 Route::get('/agent/user_list','AgentController@user_list');
 Route::get('/agent/create_qrcode','AgentController@create_qrcode');
 Route::get('/agent/agent_list','AgentController@agent_list');
+Route::get('/menu/menuList','MenuController@menu_list');
+Route::post('/menu/do_add_menu','MenuController@do_add_menu');
+Route::get('/menu/reload_menu','MenuController@reload_menu');
+Route::get('/menu/del_menu','MenuController@del_menu');
 
+/////////////
+Route::get('/liuyan/liuyan_info','Liuyan@liuyan_info');
+Route::get('/liuyan/login','Liuyan@login');
+Route::get('/liuyan/code','Liuyan@code');
 
 ///////////////
 Route::get('/index/index','home\indexController@index');
