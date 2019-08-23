@@ -27,5 +27,7 @@
    </table>
 
 </center>
+<script src="/mstore/js/jquery.min.js"></script>
+<script src=""></script>
 </body>
 </html>

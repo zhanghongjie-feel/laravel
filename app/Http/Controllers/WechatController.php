@@ -335,9 +335,9 @@ public function get_voice_source()
         $url = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->wechat->get_access_token().'&media_id='.$media_id;
         //echo $url;echo '</br>';
         //保存图片
+        //$h = $response->getHeaders();
         $client = new Client();
         $response = $client->get($url);
-        //$h = $response->getHeaders();
         //echo '<pre>';print_r($h);echo '</pre>';die;
         //获取文件名
         $file_info = $response->getHeader('Content-disposition');
@@ -444,7 +444,7 @@ public function get_voice_source()
         $openid="oJMd0wcq7cO14e9PYacBE8SP9yug";
         $wechat_user=file_get_contents("https://api.weixin.qq.com/cgi-bin/user/info?access_token=".$access_token."&openid=".$openid."&lang=zh_CN");
         $user_info=json_decode($wechat_user,1);
-        // dd($user_info);
+//         dd($user_info);
         $res=DB::connection('weixin')->table('wechat_openid')->insert([
           'openid'=>$user_info['openid'],
           'subscribe'=>$user_info['subscribe'],
@@ -453,7 +453,7 @@ public function get_voice_source()
           'nickname'=>$user_info['nickname']
 
         ]);
-        // dd($res);
+         dd($res);
         return $user_info;
     }
     public function wechat_user_info($openid){

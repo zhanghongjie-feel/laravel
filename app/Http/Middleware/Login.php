@@ -20,13 +20,13 @@ class Login
         $result=$request->session()->has('username');
         // dd($result);
         if($result){
-            echo '登陆成功';
+//            echo '登陆成功';
         }
         
         $response = $next($request);
 
         //后置
-        echo 222;
+//        echo 222;
         return $response;
        
         // return $next($request);

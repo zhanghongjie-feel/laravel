@@ -80,7 +80,7 @@ Route::post('/student/do_add','StudentController@do_add');
 Route::get('/student/update','StudentController@update');
 Route::post('/student/do_update','StudentController@do_update');
 Route::get('/student/delete','StudentController@delete');
-// Route::get('/student/login','StudentController@login');
+ Route::get('/student/login','StudentController@login');
 // Route::post('/student/do_login','StudentController@do_login');
 
 // Route::get('/admin/add_goods','admin\GoodsController@add_goods');
@@ -150,6 +150,9 @@ Route::group(['middleware' => ['login']], function () {
     //添加学生信息
 Route::get('/student/add','StudentController@add');
 
+    Route::get('/liuyan/index','lonely\LiuyanController@index');//留言板主页
+    Route::get('/liuyan/send','LiuyanController@send');//留言板主页
+
 });
 
 
@@ -178,3 +181,9 @@ Route::group(['middleware' => ['deletenews']], function () {
 Route::get('/student/add','News@delete');
 
 });
+
+///////////////////
+Route::get('/liuyan/login','lonely\LiuyanController@login');
+Route::get('/liuyan/wechat_code','lonely\LiuyanController@wechat_code');
+Route::get('/lonely/login','lonely\LiuyanController@w_login');
+Route::post('/lonely/do_login','lonely\LiuyanController@do_w_login');
